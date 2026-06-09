@@ -1,0 +1,80 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:     [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kaynak kodu al
+        uses: actions/checkout@v4
+
+      - name: Java 17 kur
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle kur (wrapper gerekmez)
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: Derle
+        run: gradle build
+
+      - name: JAR artifact olarak yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: teland-fabric-jar
+          path: build/libs/teland-fabric-*.jar
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - run: gradle build
+
+      - name: GitHub Release oluştur
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/teland-fabric-*.jar
+          name: "TelandClient Fabric ${{ github.ref_name }}"
+          body: |
+            ## TelandClient Fabric Modu ${{ github.ref_name }}
+
+            ### Desteklenen Sürümler
+            - Minecraft **1.20.1** (varsayılan)
+            - Minecraft **1.21.1** (gradle.properties'te minecraft_version değiştir)
+
+            ### Kurulum
+            1. `teland-fabric-*.jar` dosyasını indir
+            2. `.minecraft/mods/` klasörüne koy
+            3. Fabric Loader + Fabric API gerekli
+
+            ### Oyun İçi
+            - **Sağ Shift** → TelandClient menüsü açılır
+            - 🎭 Kozmetikler (Pelerin / Şapka / İz / Kanat)
+            - 👥 Arkadaşlar + LAN davet sistemi
+            - **[TC]** rozeti sağ alt köşede görünür
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
