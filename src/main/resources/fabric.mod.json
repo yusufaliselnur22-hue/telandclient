@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "telandclient",
+  "version": "${version}",
+  "name": "TelandClient",
+  "description": "TelandClient Fabric Modu — Kozmetikler, Arkadaşlar, [TC] etiketi",
+  "authors": ["TelandClient Team"],
+  "contact": {
+    "homepage": "https://telandlauncher.gt.tc",
+    "sources": "https://github.com/TelandClient/teland-fabric"
+  },
+  "license": "MIT",
+  "icon": "assets/telandclient/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": ["com.telandclient.fabric.TelandFabric"],
+    "client": ["com.telandclient.fabric.TelandFabricClient"]
+  },
+  "mixins": ["teland.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": [">=1.20 <1.22"]
+  }
+}
